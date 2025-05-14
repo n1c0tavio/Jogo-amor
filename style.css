@@ -1,0 +1,65 @@
+body {
+  font-family: sans-serif;
+  background: linear-gradient(to right, #ff9a9e, #fad0c4);
+  color: white;
+  padding: 20px;
+  text-align: center;
+  overflow-x: hidden;
+}
+h1 {
+  font-family: 'Pacifico', cursive;
+  font-size: 36px;
+  margin-bottom: 20px;
+  color: #fff;
+  text-shadow: 1px 1px 4px #d94c79;
+}
+.quiz-box {
+  max-width: 600px;
+  margin: auto;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.options button {
+  display: block;
+  width: 100%;
+  margin: 10px auto;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 17px;
+  cursor: pointer;
+  background: white;
+  color: #d94c79;
+  transition: transform 0.2s ease;
+}
+.options button:hover {
+  transform: scale(1.05);
+  background: #ffe0f0;
+}
+.options button.correct { background: #4CAF50; color: white; }
+.options button.wrong { background: #f44336; color: white; }
+#score-box {
+  margin-top: 30px;
+}
+#puzzle-container {
+  width: 300px;
+  height: 300px;
+  margin: 20px auto;
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+}
+.puzzle-piece {
+  width: 75px;
+  height: 75px;
+  background-image: url('imagem.jpg');
+  background-size: 300px 300px;
+  border: 1px solid #fff;
+  position: absolute;
+  cursor: move;
+}
+button {
+  font-size: 16px;
+}

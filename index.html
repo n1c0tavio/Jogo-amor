@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>joguinho para minha princesa</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #7b2ff7, #f107a3);
+      color: white;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    .question {
+      font-size: 22px;
+      margin: 20px 0;
+    }
+
+    .options button, .start-btn, #next-btn, #restart-btn {
+      margin: 8px;
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background: white;
+      color: #d94c79;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .options button.correct {
+      background-color: #90ee90;
+      color: black;
+    }
+
+    .options button.wrong {
+      background-color: #f08080;
+      color: black;
+    }
+
+    #puzzle-box {
+      width: 300px;
+      height: 300px;
+      margin: 30px auto;
+      position: relative;
+      display: none;
+      background-image: url("imagem.jpg");
+      background-size: cover;
+      border: 3px solid #fff;
+      border-radius: 20px;
+    }
+
+    .puzzle-piece {
+      width: 75px;
+      height: 75px;
+      position: absolute;
+      background-image: url("imagem.jpg");
+      background-size: 300px 300px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      touch-action: none;
+    }
+
+    #score-box, #final-message {
+      margin: 20px;
+      font-size: 20px;
+      color: white;
+    }
+
+    audio {
+      display: none;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 16px;
+      color: #ffffffcc;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+</head>
+<body onclick="document.getElementById('musica').play()">
+
+  <div id="start-screen">
+    <h1>joguinho só dela</h1>
+    <button onclick="startQuiz()" class="start-btn">Começar</button>
+  </div>
+
+  <div id="question-container" style="display: none;">
+    <div id="question" class="question"></div>
+    <div class="options" id="options"></div>
+  </div>
+
+  <button id="next-btn" style="display:none;">Próxima</button>
+  <div id="score-box"></div>
+  <div id="final-message"></div>
+  <div id="puzzle-box"></div>
+  <button id="restart-btn" style="display:none;">Recomeçar</button>
+
+  <footer>De Nicolas Otávio para Maria Victoria</footer>
+
+  <audio id="musica" src="musica.mp3" loop autoplay></audio>
+
+  <script>
+    const questions = [
+      { q: "Qual foi a primeira coisa que me encantou em você?", o: ["Seu sorriso", "Sua roupa", "Seu jeito bravo", "Seu silêncio"], c: 0 },
+      { q: "Onde eu mais gosto de estar?", o: ["No shopping", "No seu abraço", "Em casa assistindo", "Em festa"], c: 1 },
+      { q: "O que me faz lembrar de você todos os dias?", o: ["O céu", "Seu perfume", "Seu olhar", "as coisas boas"], c: 3 },
+      { q: "Se eu pudesse escolher qualquer lugar do mundo, eu iria…", o: ["Paris", "Sua casa", "Onde você estiver", "Um lugar calmo"], c: 2 },
+      { q: "Qual dessas frases mais combina com nosso amor?", o: ["Pouco tempo, pouca intensidade", "Tudo é fase", "Desde cedo, já era destino", "Nada sério"], c: 2 },
+      { q: "Se o amor fosse uma música, a nossa seria…", o: ["Ser humano ou anjo", "Perfect", "Tá Escrito", "Evidências"], c: 0 },
+      { q: "Qual a data que te pedi em namoro?", o: ["1/7", "14/2", "25/12", "30/6"], c: 0 },
+      { q: "O que eu mais quero com você?", o: ["Momentos passageiros", "Uma amizade pra sempre", "Uma história de verdade", "Nada sério"], c: 2 }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let unlockedPieces = [];
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const nextBtn = document.getElementById("next-btn");
+    const restartBtn = document.getElementById("restart-btn");
+    const scoreBox = document.getElementById("score-box");
+    const finalMsg = document.getElementById("final-message");
+    const puzzleBox = document.getElementById("puzzle-box");
+
+    function startQuiz() {
+      document.getElementById("start-screen").style.display = "none";
+      document.getElementById("question-container").style.display = "block";
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const q = questions[current];
+      questionEl.innerText = q.q;
+      optionsEl.innerHTML = "";
+      q.o.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.innerText = opt;
+        btn.onclick = () => selectOption(i, btn);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function selectOption(index, btn) {
+      const q = questions[current];
+      const all = optionsEl.querySelectorAll("button");
+      all.forEach(b => b.disabled = true);
+      if (index === q.c) {
+        btn.classList.add("correct");
+        score += 10 / questions.length;
+        unlockedPieces.push(current * 2);
+        unlockedPieces.push(current * 2 + 1);
+      } else {
+        btn.classList.add("wrong");
+        all[q.c].classList.add("correct");
+      }
+      nextBtn.style.display = "inline-block";
+    }
+
+    nextBtn.onclick = () => {
+      current++;
+      if (current < questions.length) {
+        nextBtn.style.display = "none";
+        showQuestion();
+      } else {
+        showResult();
+      }
+    };
+
+    restartBtn.onclick = () => location.reload();
+
+    function showResult() {
+      document.getElementById("question-container").style.display = "none";
+      nextBtn.style.display = "none";
+      scoreBox.innerText = `Pontuação final: ${Math.round(score * 10) / 10} de 10`;
+      scoreBox.style.display = "block";
+      restartBtn.style.display = "inline-block";
+      if (score >= 6) {
+        finalMsg.innerHTML = `<button onclick="startPuzzle()" class="start-btn">Montar Quebra-Cabeça</button>`;
+      } else {
+        finalMsg.innerText = "Você não acertou todas, mas vai ganhar as peças mesmo assim!";
+        unlockedPieces = [...Array(16).keys()];
+        loadPuzzle();
+      }
+    }
+
+    function startPuzzle() {
+      finalMsg.innerText = "Monte o quebra-cabeça com carinho!";
+      loadPuzzle();
+    }
+
+    // QUEBRA-CABEÇA
+    let pieces = [];
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function loadPuzzle() {
+      puzzleBox.innerHTML = '';
+      puzzleBox.style.display = "block";
+      pieces = [];
+      const size = 75;
+      const positions = [];
+
+      for (let i = 0; i < 16; i++) {
+        const top = Math.floor(i / 4) * size;
+        const left = (i % 4) * size;
+        positions.push({ top, left });
+      }
+
+      const shuffled = shuffle([...positions]);
+
+      for (let i = 0; i < 16; i++) {
+        if (!unlockedPieces.includes(i)) continue;
+        const piece = document.createElement("div");
+        piece.classList.add("puzzle-piece");
+        piece.style.backgroundPosition = `-${(i % 4) * size}px -${Math.floor(i / 4) * size}px`;
+        piece.style.top = `${shuffled[i].top}px`;
+        piece.style.left = `${shuffled[i].left}px`;
+        piece.setAttribute("data-index", i);
+        puzzleBox.appendChild(piece);
+        pieces.push(piece);
+      }
+
+      enableDrag();
+    }
+
+    function enableDrag() {
+      interact('.puzzle-piece').draggable({
+        modifiers: [
+          interact.modifiers.restrictRect({ restriction: puzzleBox, endOnly: true })
+        ],
+        listeners: {
+          move(event) {
+            const target = event.target;
+            const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+            const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+            target.style.transform = `translate(${x}px, ${y}px)`;
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
